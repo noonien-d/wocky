@@ -148,6 +148,9 @@ wocky_sm_dispose (GObject *object)
 
   if (priv->dispose_has_run)
     return;
+    
+  DEBUG ("Destroy SM");
+
 
   priv->dispose_has_run = TRUE;
 
@@ -364,6 +367,9 @@ static gboolean ack_timeout_cb (gpointer d) {
   WockySMPrivate *priv = self->priv;
 
   priv->ack_timeout = 0;
+  
+  if (priv->dispose_has_run)
+    return FALSE;
 
   DEBUG ("SM ACK Timeout");
   wocky_c2s_porter_handle_error (WOCKY_C2S_PORTER(priv->porter),

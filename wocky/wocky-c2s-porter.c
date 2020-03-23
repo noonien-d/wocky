@@ -2361,5 +2361,9 @@ wocky_c2s_porter_pop_unacked_stanzas (WockyC2SPorter *porter)
 }
 
 void wocky_c2s_porter_handle_error (WockyC2SPorter *self, GError *error) {
+  
+  if (!self->priv->local_closed)
+    return;
+  
   remote_connection_closed (self, error);
 }
