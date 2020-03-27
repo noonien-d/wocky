@@ -563,11 +563,7 @@ wocky_c2s_porter_dispose (GObject *object)
   if (G_OBJECT_CLASS (wocky_c2s_porter_parent_class)->dispose)
     G_OBJECT_CLASS (wocky_c2s_porter_parent_class)->dispose (object);
 
-  if (priv->sm)
-    {
-      g_object_unref (priv->sm);
-      priv->sm = NULL;
-    }
+  g_clear_object (&priv->sm);
 }
 
 void
