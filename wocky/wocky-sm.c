@@ -74,6 +74,8 @@ wocky_sm_init (WockySM *self)
 {
   self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, WOCKY_TYPE_SM,
       WockySMPrivate);
+      
+  DEBUG ("SM Init @%p", self);
 }
 
 static void
@@ -371,7 +373,13 @@ static gboolean ack_timeout_cb (gpointer d) {
   if (priv->dispose_has_run)
     return FALSE;
 
-  DEBUG ("SM ACK Timeout");
+  DEBUG ("SM ACK Timeout @%p", self);
+
+  if (!WOCKY_IS_C2S_PORTER (porter)) {
+    DEBUG ("But porter is not a porter @%p", self);
+    return FALSE;
+  }
+
   wocky_c2s_porter_handle_error (WOCKY_C2S_PORTER(priv->porter),
       g_error_new_literal (WOCKY_XMPP_STREAM_ERROR_CONNECTION_TIMEOUT, 0, "sm ack timeout"));
 
