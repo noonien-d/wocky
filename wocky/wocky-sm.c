@@ -375,7 +375,7 @@ static gboolean ack_timeout_cb (gpointer d) {
 
   DEBUG ("SM ACK Timeout @%p", self);
 
-  if (!WOCKY_IS_C2S_PORTER (porter)) {
+  if (!WOCKY_IS_C2S_PORTER (priv->porter)) {
     DEBUG ("But porter is not a porter @%p", self);
     return FALSE;
   }
