@@ -2360,6 +2360,9 @@ void wocky_c2s_porter_handle_error (WockyC2SPorter *self, GError *error) {
   
   if (!self->priv->local_closed)
     return;
+    
+  if (self->priv->forced_shutdown)
+    return;
   
   remote_connection_closed (self, error);
 }
