@@ -2358,11 +2358,15 @@ wocky_c2s_porter_pop_unacked_stanzas (WockyC2SPorter *porter)
 
 void wocky_c2s_porter_handle_error (WockyC2SPorter *self, GError *error) {
   
-  if (!self->priv->local_closed)
+  if (!self->priv->local_closed) {
+    DEBUG ("porter error but local closed");
     return;
+  }
     
-  if (self->priv->forced_shutdown)
+  if (self->priv->forced_shutdown) {
+    DEBUG ("porter error but forced shutdown");
     return;
+  }
   
   remote_connection_closed (self, error);
 }
