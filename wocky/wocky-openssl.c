@@ -1691,16 +1691,13 @@ wocky_tls_session_constructed (GObject *object)
 
   if (session->server)
     {
-      DEBUG ("I'm a server; using TLSv1_server_method");
-      /* OpenSSL >= 1.0 returns a const here, but we need to be also   *
-       * compatible with older versions that return a non-const value, *
-       * hence the cast                                                */
-      session->method = (SSL_METHOD *) TLSv1_server_method ();
+      DEBUG ("I'm a server; using TLS_server_method");
+      session->method = (SSL_METHOD *) TLS_server_method ();
     }
   else
     {
-      DEBUG ("I'm a client; using TLSv1_client_method");
-      session->method = (SSL_METHOD *) TLSv1_client_method ();
+      DEBUG ("I'm a client; using TLS_client_method");
+      session->method = (SSL_METHOD *) TLS_client_method ();
     }
 
   session->ctx = SSL_CTX_new (session->method);
