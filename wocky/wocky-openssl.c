@@ -44,6 +44,8 @@
 #include <windows.h>
 #endif
 
+//~ #define OPENSSL_USE_DEPRECATED 1
+
 #include <openssl/ssl.h>
 
 #include <sys/stat.h>
@@ -1030,12 +1032,13 @@ _cert_status (WockyTLSSession *session,
         }
       else
         {
+/*
           WockyTLSCertStatus status = WOCKY_TLS_CERT_OK;
           X509_STORE_CTX *xctx = X509_STORE_CTX_new();
           X509_STORE *store = SSL_CTX_get_cert_store(session->ctx);
           X509 *cert = SSL_get_peer_certificate (session->ssl);
           STACK_OF(X509) *chain = SSL_get_peer_cert_chain (session->ssl);
-          long old_flags = store->param->flags;
+          long old_flags = 0;store->param->flags;
           long new_flags = old_flags;
           DEBUG("No CRL available, but not in strict mode - re-verifying");
 
@@ -1056,6 +1059,7 @@ _cert_status (WockyTLSSession *session,
           X509_free (cert);
 
           return status;
+*/
         }
       break;
     default:
@@ -1593,9 +1597,6 @@ wocky_tls_session_init (WockyTLSSession *session)
       gint malloc_init_succeeded;
 
       DEBUG ("initialising SSL library and error strings");
-
-      malloc_init_succeeded = CRYPTO_malloc_init ();
-      g_warn_if_fail (malloc_init_succeeded);
 
       SSL_library_init ();
       SSL_load_error_strings ();
