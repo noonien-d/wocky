@@ -55,6 +55,7 @@ typedef int (*sasl_callback_ft)(void);
 #else
 
 #define SASL_OK 0
+#define SASL_BADPROT  -5
 #define SASL_BADAUTH -13
 #define SASL_NOUSER  -20
 #define CHECK_SASL_RETURN(x) \
