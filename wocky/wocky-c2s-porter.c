@@ -66,6 +66,15 @@ enum
   PROP_CONNECTOR
 };
 
+typedef struct
+{
+  WockyC2SPorter *self;
+  WockyStanza *stanza;
+  GCancellable *cancellable;
+  GTask *task;
+  gulong cancelled_sig_id;
+} sending_queue_elem;
+
 /* private structure */
 struct _WockyC2SPorterPrivate
 {
@@ -79,6 +88,7 @@ struct _WockyC2SPorterPrivate
 
   /* Queue of (sending_queue_elem *) */
   GQueue *sending_queue;
+  sending_queue_elem *current_sending;
   /* Queue of sent WockyStanza's waiting for SM Ack */
   GQueue *unacked_queue;
   GCancellable *receive_cancellable;
@@ -117,14 +127,6 @@ G_DEFINE_TYPE_WITH_CODE (WockyC2SPorter, wocky_c2s_porter, G_TYPE_OBJECT,
           G_ADD_PRIVATE (WockyC2SPorter)
           G_IMPLEMENT_INTERFACE (WOCKY_TYPE_PORTER, wocky_porter_iface_init));
 
-typedef struct
-{
-  WockyC2SPorter *self;
-  WockyStanza *stanza;
-  GCancellable *cancellable;
-  GTask *task;
-  gulong cancelled_sig_id;
-} sending_queue_elem;
 
 static void wocky_c2s_porter_send_async (WockyPorter *porter,
     WockyStanza *stanza, GCancellable *cancellable,
@@ -644,6 +646,13 @@ send_head_stanza (WockyC2SPorter *self)
     /* Nothing to send */
     return;
 
+  if (elem == priv->current_sending) {
+    DEBUG_STANZA(elem->stanza, "stanza has already been sent:");
+    /* no need to remove from queue, it will be removed in the cb */
+    return;
+  }
+  priv->current_sending = elem;
+
   if (elem->cancelled_sig_id != 0)
     {
       /* We are going to start sending the stanza. Lower layers are now
@@ -672,6 +681,7 @@ terminate_sending_operations (WockyC2SPorter *self,
       g_task_return_error (elem->task, g_error_copy (error));
       sending_queue_elem_free (elem);
     }
+  priv->current_sending = NULL;
 }
 
 static gboolean
@@ -726,6 +736,7 @@ send_stanza_cb (GObject *source,
   else
     {
       sending_queue_elem *elem = g_queue_pop_head (priv->sending_queue);
+      priv->current_sending = NULL;
 
       if (elem == NULL)
         /* The elem could have been removed from the queue if its sending
